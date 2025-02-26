@@ -74,10 +74,5 @@ def str_to_json(content):
     
 
 def display_message(title, message):
-    alert = f"""
-        ---  
-        #### {title}:  
-        ##### {message}  
-        ---
-    """
+    alert = f"---\n{title}\n {message}\n---"  
     display(to_markdown(alert))

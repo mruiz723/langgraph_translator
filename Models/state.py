@@ -8,7 +8,7 @@ from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 from Models.validation import Validation, parse_ai_message_to_validation
 from Models.translation import Translation, parse_ai_message_to_translation
 from typing import Optional
-from helpers import to_markdown
+from helpers import to_markdown, display_message
 
 class State(BaseModel):
     messages: List[BaseMessage] 
@@ -43,3 +43,32 @@ class State(BaseModel):
         """
         display(to_markdown(state_dict_str, code="json"))
         display(to_markdown("---"))
+
+    def display_no_translate_prompt_msg(self):
+        """
+        Displays a notice informing users that the assistant is for translation tasks only, 
+        advising against non-translation queries. Uses emojis for clarity and engagement.
+        """
+        message = f""" 
+        </br></br>Please remember, this assistant is designed **specifically for translation purposes** 🌍📝.  
+        For the best experience, please ensure your queries are related to translating text between languages.  
+        Other types of queries may not be processed correctly. ❌🤖</br></br>  
+        ✅ Thank you for understanding! 😊🙏  
+        ---
+        """
+        display_message("⚠️ **Notice:** ⚠️", message)
+
+    def display_wrong_format_translator_prompt_msg(self):
+        """
+        Displays an error message guiding the user to correct their input format for translation requests,
+        providing examples and using emojis for clarity. It helps improve user experience by ensuring valid requests.
+        """
+        error_message = f"""
+        </br></br>🚨 Please use the format:</br>
+        🔹 **How do you say [text] in [language]?**</br>
+        🔹 **Translate [text] to [language]**</br>
+        📝 Example: *How do you say 'hello' in Spanish?* 🌍</br>
+        ⚠️ Incorrect formats may not be processed. Please try again! 🙏😊
+        ---
+        """
+        display_message("❌ **Error Message:** ❌", error_message)
