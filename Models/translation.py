@@ -5,6 +5,7 @@ import re
 # Third Party Libraries
 from pydantic import BaseModel, Field
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+from helpers import str_to_json
 
 class Translation(BaseModel):
     given_text: str = Field(..., description = "Text to be translated")
@@ -23,22 +24,13 @@ def parse_ai_message_to_translation(ai_message: AIMessage) -> Translation:
     # Extract content from AIMessage
     content = ai_message.content
 
-    # Regular expression to capture key-value pairs
-    pattern = r"given_text:\s*([A-Za-z\s]+)\ntranslated_text:\s*([A-Za-z\s]+)"
-
-    # Find all matches using regex
-    matches = re.findall(pattern, content)
+    # JSON data
+    data = str_to_json(content)    
     
-    if matches:
-        given_text, translated_text = matches[0]
-    else:
-         given_text, translated_text = "", ""
-    
-    
-    # Create the Validation model using extracted data
+    # Create the Translation model using extracted data
     translation_response = Translation(
-        given_text=given_text,
-        translated_text=translated_text,
+        given_text=data.get("given_text"),
+        translated_text=data.get("translated_text")
     )
 
     return translation_response

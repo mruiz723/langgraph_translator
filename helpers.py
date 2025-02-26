@@ -3,13 +3,14 @@ import re
 import json
 
 # Third Party Libraries
-from IPython.display import Markdown
+from IPython.display import Image, display, Markdown
+from langgraph.graph import Graph
 
-def to_markdown(text):
+def to_markdown(text, code: str = None):
     """
     Convert text to Markdown format:
     - Replace bullet points (•) with Markdown lists (* item)
-    - Preserve Python code blocks correctly
+    - Preserve xml code blocks correctly
     - Add blockquote formatting to non-code text
 
     Args:
@@ -23,7 +24,7 @@ def to_markdown(text):
 
     # Function to preserve code blocks
     def preserve_code(match):
-        return f"\n```xml\n{match.group(1)}\n```\n"
+        return f"\n```code\n{match.group(1)}\n```\n"
 
     # Extract and preserve Python code blocks
     text = re.sub(r"```xml\n(.*?)\n```", preserve_code, text, flags=re.DOTALL)
@@ -52,3 +53,31 @@ def to_markdown(text):
     formatted_text = "\n".join(formatted_lines)
     
     return Markdown(formatted_text)
+
+def draw_graph(app):
+    """
+    Draw the graph as an image
+    """
+    display(Image(app.get_graph().draw_mermaid_png()))
+
+
+def str_to_json(content):
+    """
+    Convert string content to a dictionary using JSON
+    """
+    try:
+        return json.loads(content)
+    except json.JSONDecodeError as e:
+        display(to_markdown(f"**Invalid JSON Response:**\n```json\n{content}\n```"))
+        raise ValueError(f"Invalid JSON format: {e}")
+    return data
+    
+
+def display_message(title, message):
+    alert = f"""
+        ---  
+        #### {title}:  
+        ##### {message}  
+        ---
+    """
+    display(to_markdown(alert))

@@ -5,6 +5,7 @@ import re
 # Third Party Libraries
 from pydantic import BaseModel, Field
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
+from helpers import str_to_json
 
 class Validation(BaseModel):
     source_language: str = Field(..., description = "The Detected language") # "unknown" by default 
@@ -41,30 +42,18 @@ def parse_ai_message_to_validation(ai_message: AIMessage) -> Validation:
     Returns:
         Validation: A Pydantic model populated with the parsed data.
     """
+    
     # Extract content from AIMessage
     content = ai_message.content
 
-    # Regular expression to capture key-value pairs
-    pattern = r'(\w+)\s*=\s*(?:"([^"]+)"|(\bTrue\b|\bFalse\b))'
-
-    # Find all matches using regex
-    matches = re.findall(pattern, content)
-
-    # Convert matches to a dictionary
-    data = {}
-    for key, str_value, bool_value in matches:
-        if bool_value:
-            print(f"bool")
-            data[key] = bool_value == "True"
-        else: 
-            print(f"string")
-            data[key] = str_value
+    # JSON data
+    data = str_to_json(content)
 
     # Create the Validation model using extracted data
     validation_response = Validation(
         source_language=data.get("source_language", "unknown"),
         target_language=data.get("target_language", "unknown"),
-        translate=data.get("translate", False), # Always a boolean
+        translate = data.get("translate", False) in ["true", "True", True],
         text=data.get("text", "")
     )
 
